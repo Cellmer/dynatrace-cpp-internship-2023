@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include <string>
+#include <algorithm>
 
 #include <date/date.h>
 #include <rapidjson/document.h>
@@ -10,6 +10,13 @@
 
 namespace internship
 {
+
+    std::ostream &operator<<(std::ostream &stream, const OperatingSystem &os)
+    {
+        stream << os.name << " " << os.cycle << " " << os.supportPeriod;
+        return stream;
+    }
+
     // returns duration in days, releaseDate and eol must be dates in format YYYY-mm-dd
     int calculateSupportPeriod(const std::string &releaseDate, const std::string &eol)
     {
@@ -46,8 +53,6 @@ namespace internship
                 // add all os versions to vector
                 for (const auto &os : product["versions"].GetArray())
                 {
-                    std::cout << "Product Name: " << product["name"].GetString() << "\n";
-
                     operatingSystems.emplace_back(product["name"].GetString(),
                                                   os["cycle"].GetString(),
                                                   calculateSupportPeriod(os["releaseDate"].GetString(), os["eol"].GetString()));
@@ -61,9 +66,15 @@ namespace internship
         std::vector<OperatingSystem> operatingSystems;
         getOperatingSystemsFromJson(operatingSystems, jsonFileName);
 
-        for (const auto& os : operatingSystems)
+        // sort vector in order to extract n max values
+        std::partial_sort(operatingSystems.begin(), operatingSystems.begin() + elementsCount, operatingSystems.end(),
+                          [](OperatingSystem a, OperatingSystem b)
+                          { return a.supportPeriod > b.supportPeriod; });
+
+        for (int i = 0; i < elementsCount; i++)
         {
-            std::cout << os.name << " " << os.cycle << " " << os.supportPeriod << "\n";
+            std::cout << operatingSystems[i] << "\n";
         }
     }
+
 }

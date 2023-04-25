@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace internship
 {
@@ -11,8 +12,8 @@ namespace internship
         std::string cycle;
         int supportPeriod;
 
-        OperatingSystem(std::string name, std::string cycle, int supportPeriod) : 
-            name(name), cycle(cycle), supportPeriod(supportPeriod)
+        OperatingSystem(std::string name, std::string cycle, int supportPeriod) 
+            : name(name), cycle(cycle), supportPeriod(supportPeriod)
         {
         }
     };
