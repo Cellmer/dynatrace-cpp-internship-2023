@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
+#include <cstdio>
 
 #include <date/date.h>
 #include <rapidjson/document.h>
@@ -48,7 +49,7 @@ namespace internship
         return duration_in_days;
     }
 
-    // populates vector with values about os from json file
+    // populates vector with values about os from json file, omits bad formatted objects
     void getOperatingSystemsFromJson(std::vector<OperatingSystem> &operatingSystems, const std::string &fileName)
     {
         std::ifstream ifs(fileName);
@@ -56,10 +57,14 @@ namespace internship
         rapidjson::Document products;
         products.ParseStream(isw);
 
+        // iterate through products and push to vector all operating systems, omit badly formatted input
         for (const auto &product : products.GetArray())
         {
-            if (product["os"].GetBool())
+            if (product.HasMember("os") && product["os"].IsBool() && product["os"].GetBool())
             {
+                if (!product.HasMember("versions") || !product["versions"].IsArray())
+                    continue;
+
                 // reserve place for all versions to avoid copying in every iteration
                 operatingSystems.reserve(operatingSystems.size() + product["versions"].GetArray().Capacity());
 
@@ -71,14 +76,18 @@ namespace internship
                 {
                     try
                     {
+                        if (!product.HasMember("name") || !product["name"].IsString() ||
+                            !os.HasMember("cycle") || !os["cycle"].IsString() ||
+                            !os.HasMember("releaseDate") || !os["releaseDate"].IsString() ||
+                            !os.HasMember("eol") || !os["eol"].IsString())
+                            continue;
+
                         name = product["name"].GetString();
                         cycle = os["cycle"].GetString();
                         supportPeriod = calculateSupportPeriod(os["releaseDate"].GetString(), os["eol"].GetString());
                     }
-                    catch(std::invalid_argument const& ex)
+                    catch (std::invalid_argument const &ex)
                     {
-                        // TODO Delete before releasing
-                        std::cout << ex.what()<< std::endl;
                         continue;
                     }
 
