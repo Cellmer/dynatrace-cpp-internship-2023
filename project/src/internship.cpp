@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <stdexcept>
 
 #include <date/date.h>
 #include <rapidjson/document.h>
@@ -25,9 +26,21 @@ namespace internship
         date::sys_days releaseDateDays;
         iss >> date::parse("%F", releaseDateDays);
 
+        // date was in bad formatting
+        if (!iss)
+            throw std::invalid_argument("Unrecognised date format!");
+
         iss.str(eol);
         date::sys_days eolDays;
         iss >> date::parse("%F", eolDays);
+
+        // date was in bad formatting
+        if (!iss)
+            throw std::invalid_argument("Unrecognised date format!");
+
+        // release date is after eol
+        if (releaseDateDays > eolDays)
+            throw std::invalid_argument("Invalid dates!");
 
         // contains both starting and ending day
         int duration_in_days = (eolDays - releaseDateDays).count() + 1;
@@ -50,12 +63,26 @@ namespace internship
                 // reserve place for all versions to avoid copying in every iteration
                 operatingSystems.reserve(operatingSystems.size() + product["versions"].GetArray().Capacity());
 
+                std::string name;
+                std::string cycle;
+                int supportPeriod;
                 // add all os versions to vector
                 for (const auto &os : product["versions"].GetArray())
                 {
-                    operatingSystems.emplace_back(product["name"].GetString(),
-                                                  os["cycle"].GetString(),
-                                                  calculateSupportPeriod(os["releaseDate"].GetString(), os["eol"].GetString()));
+                    try
+                    {
+                        name = product["name"].GetString();
+                        cycle = os["cycle"].GetString();
+                        supportPeriod = calculateSupportPeriod(os["releaseDate"].GetString(), os["eol"].GetString());
+                    }
+                    catch(std::invalid_argument const& ex)
+                    {
+                        // TODO Delete before releasing
+                        std::cout << ex.what()<< std::endl;
+                        continue;
+                    }
+
+                    operatingSystems.emplace_back(name, cycle, supportPeriod);
                 }
             }
         }
