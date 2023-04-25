@@ -1,33 +1,32 @@
-#include <chrono>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 #include <date/date.h>
-#include <nlohmann/json.hpp>
 
 #include "internship.h"
 
-using json = nlohmann::json;
-using namespace date;
 
 namespace internship {
-    // remove this function before submitting your solution
-    void example(const std::string& jsonFileName) {
-        std::ifstream f(jsonFileName);
-        json data = json::parse(f);
 
-        std::cout << "Dynatrace Gdansk Summer Internship 2023\n"
-                    << "UTC time now: " << std::chrono::system_clock::now() << "\n\n";
+    // releaseDate and eol must be dates in format YYYY-mm-dd
+    int calculateSupportPeriod(const std::string& releaseDate, const std::string& eol) {
+        // get objects describing both dates
+        std::istringstream iss(releaseDate);
+        date::sys_days releaseDateDays;
+        iss >> date::parse("%F", releaseDateDays);
 
-        for(const auto& [id, product] : data.items()) {
-            std::cout << "Product name: " << product["name"] << "\n";
-        }
+        iss.str(eol);
+        date::sys_days eolDays;
+        iss >> date::parse("%F", eolDays);
+
+        // containing both starting and ending day
+        int duration_in_days = (eolDays - releaseDateDays).count() + 1;
+
+        return duration_in_days;
     }
 
-    // do not remove this function
     void solution(const std::string& jsonFileName, int elementsCount) {
-        example(jsonFileName); // remove this call before submitting your solution
-
-        // put the call to your solution here
+        std::cout << calculateSupportPeriod("2023-01-03", "2024-08-04") << "\n";
     }
 }
