@@ -2,7 +2,6 @@
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
-#include <cstdio>
 
 #include <date/date.h>
 #include <rapidjson/document.h>
