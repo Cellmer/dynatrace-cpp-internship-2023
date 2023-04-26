@@ -9,17 +9,16 @@
 
 #include "internship.h"
 
-namespace internship
-{
+namespace internship {
 
-    std::ostream &operator<<(std::ostream &stream, const OperatingSystem &os)
+    std::ostream& operator<<(std::ostream& stream, const OperatingSystem& os)
     {
         stream << os.name << " " << os.cycle << " " << os.supportPeriod;
         return stream;
     }
 
     // returns duration in days, releaseDate and eol must be dates in format YYYY-mm-dd
-    int calculateSupportPeriod(const std::string &releaseDate, const std::string &eol)
+    int calculateSupportPeriod(const std::string& releaseDate, const std::string& eol)
     {
         // get objects describing both dates
         std::istringstream iss(releaseDate);
@@ -49,7 +48,7 @@ namespace internship
     }
 
     // populates vector with values about os from json file, omits bad formatted objects
-    void getOperatingSystemsFromJson(std::vector<OperatingSystem> &operatingSystems, const std::string &fileName)
+    void getOperatingSystemsFromJson(std::vector<OperatingSystem>& operatingSystems, const std::string& fileName)
     {
         std::ifstream ifs(fileName);
         rapidjson::IStreamWrapper isw(ifs);
@@ -57,7 +56,7 @@ namespace internship
         products.ParseStream(isw);
 
         // iterate through products and push to vector all operating systems, omit badly formatted input
-        for (const auto &product : products.GetArray())
+        for (const auto& product : products.GetArray())
         {
             if (product.HasMember("os") && product["os"].IsBool() && product["os"].GetBool())
             {
@@ -71,7 +70,7 @@ namespace internship
                 std::string cycle;
                 int supportPeriod;
                 // add all os versions to vector
-                for (const auto &os : product["versions"].GetArray())
+                for (const auto& os : product["versions"].GetArray())
                 {
                     try
                     {
@@ -85,7 +84,7 @@ namespace internship
                         cycle = os["cycle"].GetString();
                         supportPeriod = calculateSupportPeriod(os["releaseDate"].GetString(), os["eol"].GetString());
                     }
-                    catch (std::invalid_argument const &ex)
+                    catch (const std::invalid_argument& ex)
                     {
                         continue;
                     }
@@ -96,7 +95,7 @@ namespace internship
         }
     }
 
-    void solution(const std::string &jsonFileName, int elementsCount)
+    void solution(const std::string& jsonFileName, int elementsCount)
     {
         std::vector<OperatingSystem> operatingSystems;
         getOperatingSystemsFromJson(operatingSystems, jsonFileName);

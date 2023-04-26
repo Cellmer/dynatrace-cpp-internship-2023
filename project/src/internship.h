@@ -3,8 +3,7 @@
 #include <vector>
 #include <iostream>
 
-namespace internship
-{
+namespace internship {
 
     struct OperatingSystem
     {
@@ -19,11 +18,11 @@ namespace internship
     };
 
     // returns duration in days, releaseDate and eol must be dates in format YYYY-mm-dd
-    int calculateSupportPeriod(const std::string &releaseDate, const std::string &eol);
+    int calculateSupportPeriod(const std::string& releaseDate, const std::string& eol);
 
     // populates vector with values about os from json file
-    void getOperatingSystemsFromJson(std::vector<OperatingSystem> &operatingSystems, const std::string &fileName);
+    void getOperatingSystemsFromJson(std::vector<OperatingSystem>& operatingSystems, const std::string& fileName);
 
-    void solution(const std::string &jsonFileName, int elementsCount);
+    void solution(const std::string& jsonFileName, int elementsCount);
 
 }
